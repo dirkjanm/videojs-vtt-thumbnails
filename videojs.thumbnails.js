@@ -164,7 +164,6 @@
       while (i<cnum) {
         var ccue = thumbTrack.cues[i];
         if (ccue.startTime <= mouseTime && ccue.endTime >= mouseTime) {
-          console.log(ccue)
           setting = parseImageLink(ccue.text);
           break;
         }
