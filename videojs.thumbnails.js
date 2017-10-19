@@ -66,27 +66,30 @@
    * register the thubmnails plugin
    */
   videojs.plugin('thumbnails', function(options) {
-    var div, settings, img, player, progressControl, duration, moveListener, moveCancel, thumbTrack;
+    var div, settings, img, player, progressControl, duration, moveListener, moveCancel, thumbTrack, tracks;
     defaults.basePath = options.basePath || defaults.basePath;
     settings = extend({}, defaults, options);
     player = this;
-
+    
     player.ready(function() {
-      //detect which track we use. For now we just use the first metadata track
-      var numtracks = player.textTracks().length;
-      if (numtracks === 0) {
-        return;
+      tracks = player.remoteTextTracks();
+      checkForTracks();
+      if (!thumbTrack)
+          tracks.addEventListener('addtrack', checkForTracks);
+    });
+
+    function checkForTracks() {
+      if (thumbTrack) return;
+      for (var i = 0; i < tracks.length; i++) {
+          if (tracks[i].kind === 'metadata') {
+              thumbTrack = tracks[i];
+              // Chrome needs this
+              thumbTrack.mode = 'hidden';
+              break;
+          }
       }
-      i = 0;
-      while (i<numtracks) {
-        if (player.textTracks()[i].kind==='metadata') {
-          thumbTrack = player.textTracks()[i];
-          //Chrome needs this
-          thumbTrack.mode = 'hidden';
-          break;
-        }
-        i++;
-      }
+      if (!thumbTrack) return;
+      
       (function() {
         var progressControl, addFakeActive, removeFakeActive;
         // Android doesn't support :active and :hover on non-anchor and non-button elements
@@ -114,13 +117,13 @@
       div.appendChild(img);
       img.className = 'vjs-thumbnail';
 
-    // keep track of the duration to calculate correct thumbnail to display
-    duration = player.duration();
-    
-    // when the container is MP4
-    player.on('durationchange', function(event) {
+      // keep track of the duration to calculate correct thumbnail to display
       duration = player.duration();
-    });
+      
+      // when the container is MP4
+      player.on('durationchange', function(event) {
+        duration = player.duration();
+      });
 
       // when the container is HLS
       player.on('loadedmetadata', function(event) {
@@ -228,6 +231,6 @@
       progressControl.on('touchcancel', moveCancel);
       progressControl.on('touchend', moveCancel);
       player.on('userinactive', moveCancel);
-    });
+    }
   });
 })();
