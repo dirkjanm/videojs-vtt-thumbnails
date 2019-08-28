@@ -39,9 +39,9 @@ Full object example:
        class='video-js vjs-default-skin'
        width='640'
        height='264'
-       poster='http://video-js.zencoder.com/oceans-clip.jpg'
+       poster='https://vjs.zencdn.net/v/oceans.png'
        controls>
-  <source src='http://video-js.zencoder.com/oceans-clip.mp4' type='video/mp4' />
+  <source src='https://vjs.zencdn.net/v/oceans.mp4' type='video/mp4' />
   <track kind="metadata" src="oceans.vtt"></track>
 </video>
 ```
