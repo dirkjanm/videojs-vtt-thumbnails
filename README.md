@@ -21,7 +21,7 @@ To activate the plugin, add it to your videojs settings object:
 ```html
 <script>
 // initialize video.js
-var video = videojs('video',{plugins:{thumbnails:{}}});
+var video = videojs('video',{plugins:{vttThumbnails:{}}});
 </script>
 ```
 
@@ -51,7 +51,7 @@ If your thumbnails do not include specified width and height in the VTT file (vi
 ```html
 <script>
 // initialize video.js
-var video = videojs('video',{plugins:{thumbnails:{width:120,height:90}}});
+var video = videojs('video',{plugins:{vttThumbnails:{width:120,height:90}}});
 </script>
 ```
 
@@ -59,6 +59,6 @@ You can add an optional basePath if you want to use images hosted on another dom
 ```html
 <script>
 // initialize video.js
-var video = videojs('video',{plugins:{thumbnails:{width:120,height:90, basePath : "//external.url/basepath/"}}});
+var video = videojs('video',{plugins:{vttThumbnails:{width:120,height:90, basePath : "//external.url/basepath/"}}});
 </script>
 ```
