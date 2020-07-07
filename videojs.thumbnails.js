@@ -52,12 +52,12 @@
       hashindex = imglocation.indexOf('#');
       if (hashindex === -1) {
         return {src:imglocation,w:0,h:0,x:0,y:0};
-      } 
+      }
       lsrc = imglocation.substring(0,hashindex);
       hashstring = imglocation.substring(hashindex+1);
       if (hashstring.substring(0,5) !== 'xywh=') {
         return {src:defaults.basePath + lsrc,w:0,h:0,x:0,y:0};
-      } 
+      }
       var data = hashstring.substring(5).split(',');
       return {src:defaults.basePath + lsrc,w:parseInt(data[2]),h:parseInt(data[3]),x:parseInt(data[0]),y:parseInt(data[1])};
     };
@@ -65,8 +65,9 @@
   /**
    * register the thubmnails plugin
    */
-  videojs.plugin('thumbnails', function(options) {
-    var div, settings, img, player, progressControl, duration, moveListener, moveCancel, thumbTrack;
+  var registerPlugin = videojs.registerPlugin || videojs.plugin;
+  registerPlugin('thumbnails', function(options) {
+    var div, settings, img_div, player, progressControl, duration, moveListener, moveCancel, thumbTrack;
     defaults.basePath = options.basePath || defaults.basePath;
     settings = extend({}, defaults, options);
     player = this;
@@ -76,8 +77,9 @@
       return;
     }
     i = 0;
+
     while (i<numtracks) {
-      if (player.textTracks()[i].kind==='metadata') {
+      if (player.textTracks()[i].label === 'thumbs') {
         thumbTrack = player.textTracks()[i];
         //Chrome needs this
         thumbTrack.mode = 'hidden';
@@ -85,6 +87,7 @@
       }
       i++;
     }
+
     (function() {
       var progressControl, addFakeActive, removeFakeActive;
       // Android doesn't support :active and :hover on non-anchor and non-button elements
@@ -108,13 +111,13 @@
     // create the thumbnail
     div = document.createElement('div');
     div.className = 'vjs-thumbnail-holder';
-    img = document.createElement('img');
-    div.appendChild(img);
-    img.className = 'vjs-thumbnail';
+    img_div = document.createElement('div');
+    div.appendChild(img_div);
+    img_div.className = 'vjs-thumbnail';
 
     // keep track of the duration to calculate correct thumbnail to display
     duration = player.duration();
-    
+
     // when the container is MP4
     player.on('durationchange', function(event) {
       duration = player.duration();
@@ -151,11 +154,14 @@
       // `left` applies to the mouse position relative to the player so we need
       // to remove the progress control's left offset to know the mouse position
       // relative to the progress control
-      mouseTime = Math.floor((left - progressControl.el().offsetLeft) / progressControl.width() * duration);
+      //
+      //mouseTime = Math.floor((left - progressControl.el().offsetLeft) / progressControl.width() * duration);
+      mouseTime = Math.floor((left) / progressControl.width() * duration);
 
       //Now check which of the cues applies
       var cnum = thumbTrack&&thumbTrack.cues.length;
       i = 0;
+
       while (i<cnum) {
         var ccue = thumbTrack.cues[i];
         if (ccue.startTime <= mouseTime && ccue.endTime >= mouseTime) {
@@ -167,11 +173,11 @@
       //None found, so show nothing
       if (typeof setting === 'undefined') {
         return;
-      } 
+      }
 
       //Changed image?
-      if (setting.src && img.src != setting.src) {
-        img.src = setting.src;
+      if (setting.src && img_div.style.backgroundImage != "url('"+setting.src+"')") {
+        img_div.style.backgroundImage = "url('"+setting.src+"')";
       }
 
       //Fall back to plugin defaults in case no height/width is specified
@@ -187,11 +193,9 @@
         div.style.width = setting.w + 'px';
         div.style.height = setting.h + 'px';
       }
-      //Set the image cropping
-      img.style.left = -(setting.x) + 'px';
-      img.style.top = -(setting.y) + 'px';
-      img.style.clip = 'rect('+setting.y+'px,'+(setting.w+setting.x)+'px,'+(setting.y+setting.h)+'px,'+setting.x+'px)';
-      
+
+      img_div.style.backgroundPosition = (-1*setting.x)+"px "+ (-1 * setting.y)+"px";
+
       width = setting.w;
       halfWidth = width / 2;
 
