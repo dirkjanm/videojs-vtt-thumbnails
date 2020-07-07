@@ -65,7 +65,8 @@
   /**
    * register the thubmnails plugin
    */
-  videojs.plugin('thumbnails', function(options) {
+  var registerPlugin = videojs.registerPlugin || videojs.plugin;
+  registerPlugin('thumbnails', function(options) {
     var div, settings, img_div, player, progressControl, duration, moveListener, moveCancel, thumbTrack;
     defaults.basePath = options.basePath || defaults.basePath;
     settings = extend({}, defaults, options);
